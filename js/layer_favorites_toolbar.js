@@ -1,22 +1,22 @@
 // Layer Favorites Toolbar – Initialization function (called only when viewer is loaded)
 function initLayerFavoritesToolbar() {
-  /* Generate document-specific prefix for localStorage keys */
+  // /* Generate document-specific prefix for localStorage keys */
   const docPrefix = location.pathname.replace(/[\/\\]/g, '_') + '_';
 
-  /* AUTO-CLEAR MODE */
-  let autoClearMode = JSON.parse(localStorage.getItem(docPrefix + 'autoClearMode') || 'false');
+  // /* AUTO-CLEAR MODE */
+  let autoClearMode = JSON.parse(localStorage.getItem(docPrefix + 'autoClearMode') || 'true');
 
-  /* LOCKED MODE */
+  // /* LOCKED MODE */
   let lockedMode = JSON.parse(localStorage.getItem(docPrefix + 'lockedMode') || 'false');
 
-  /* Function to turn off layers */
+  // /* Function to turn off layers */
   const performClear = () => {
     origo.api().getLayersByProperty('visible', true)
       .filter((layer) => layer.get('group') !== 'background' && layer.get('group') !== 'rit' && layer.get('name') !== 'measure')
       .forEach(layer => layer.setVisible(false));
   };
 
-  /* Update appearance of clear button */
+  // /* Update appearance of clear button */
   const updateClearButtonAppearance = () => {
     if (autoClearMode) {
       clearButton.classList.add('auto-clear-active');
@@ -27,21 +27,44 @@ function initLayerFavoritesToolbar() {
     }
   };
 
-  /* Save Auto-clear mode */
+  // /* Save Auto-clear mode */
   const saveAutoClearMode = () => {
     localStorage.setItem(docPrefix + 'autoClearMode', JSON.stringify(autoClearMode));
   };
 
-  /* Save Locked mode */
+  // /* Save Locked mode */
   const saveLockedMode = () => {
     localStorage.setItem(docPrefix + 'lockedMode', JSON.stringify(lockedMode));
   };
 
-  /* Create top-bar */
+  // /* Create top-bar */
   const topBar = document.createElement('div');
   topBar.className = 'top-bar no-transition';
 
-  /* LOCK ICON – left of clear button */
+
+  // /* --- FLÄRP / TAB TRIGGER --- */
+  const favoritesTab = document.createElement('div');
+  favoritesTab.className = 'favorites-tab';
+
+
+  favoritesTab.innerHTML = `
+    <div class="flap-bar"></div>
+    <div class="flap-arrow" aria-hidden="true">
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" focusable="false">
+        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
+      </svg>
+    </div>
+  `;
+
+  document.body.appendChild(favoritesTab);
+
+  // Klick = visa toolbar
+  favoritesTab.onclick = () => {
+  topBar.classList.remove('hidden');
+  showTopBarAndPushCenter(); 
+  };
+
+  // /* LOCK ICON – left of clear button */
   const lockButton = document.createElement('button');
   lockButton.className = 'lock-button';
   const lockSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -52,7 +75,7 @@ function initLayerFavoritesToolbar() {
   lockSvg.appendChild(lockPath);
   lockButton.appendChild(lockSvg);
 
-  /* Clear button */
+  // /* Clear button */
   const clearButton = document.createElement('button');
   clearButton.className = 'clear-button';
   const clearSvgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -63,12 +86,12 @@ function initLayerFavoritesToolbar() {
   clearSvgIcon.appendChild(clearUseIcon);
   clearButton.appendChild(clearSvgIcon);
 
-  /* Single click: clear layers */
+  // /* Single click: clear layers */
   clearButton.onclick = () => {
     performClear();
   };
 
-  /* Double click / long press: toggle Auto-clear */
+  // /* Double click / long press: toggle Auto-clear */
   let clickCount = 0;
   let clickTimer = null;
   clearButton.addEventListener('click', (e) => {
@@ -84,7 +107,7 @@ function initLayerFavoritesToolbar() {
     }
   });
 
-  /* Long press on touch */
+  // /* Long press on touch */
   let longPressTimer = null;
   let longPressPointerId = null;
   let longPressStartY = null;
@@ -126,42 +149,130 @@ function initLayerFavoritesToolbar() {
     }
   }, { passive: true });
 
-  /* Dropdown for loading favorites */
-  const loadSelect = document.createElement('select');
-  loadSelect.title = 'Välj lagerfavorit att tända';
-  loadSelect.innerHTML = '<option value="">Tänd lagerfavorit...</option>';
-  const updateSelectColor = () => {
-    loadSelect.style.color = loadSelect.value === '' ? '#ccc' : '#000';
-  };
+  // // /* Dropdown for loading favorites */
+  // const loadSelect = document.createElement('select');
+  // loadSelect.title = 'Välj lagerfavorit att tända';
+  // loadSelect.innerHTML = '<option value="">Tänd lagerfavorit...</option>';
+  // const updateSelectColor = () => {
+    // loadSelect.style.color = loadSelect.value === '' ? '#ccc' : '#000';
+  // };
 
-  const updateDropdown = () => {
-    const savedIds = JSON.parse(localStorage.getItem(docPrefix + 'savedLayersIds') || '[]');
-    loadSelect.innerHTML = '<option value="">Tänd lagerfavorit...</option>';
-    savedIds.forEach(id => {
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.textContent = id;
-      loadSelect.appendChild(opt);
-    });
-    updateSelectColor();
-  };
+  // const updateDropdown = () => {
+    // const savedIds = JSON.parse(localStorage.getItem(docPrefix + 'savedLayersIds') || '[]');
+    // loadSelect.innerHTML = '<option value="">Tänd lagerfavorit...</option>';
+    // savedIds.forEach(id => {
+      // const opt = document.createElement('option');
+      // opt.value = id;
+      // opt.textContent = id;
+      // loadSelect.appendChild(opt);
+    // });
+    // updateSelectColor();
+  // };
 
-  loadSelect.onchange = () => {
-    const id = loadSelect.value;
-    if (id) {
+  // loadSelect.onchange = () => {
+    // const id = loadSelect.value;
+    // if (id) {
+      // if (autoClearMode) performClear();
+      // const saved = localStorage.getItem(docPrefix + 'savedLayers_' + id) || '';
+      // saved.split(',').forEach(name => name && origo.api().getLayer(name)?.setVisible(true));
+      // loadSelect.value = '';
+      // updateSelectColor();
+    // }
+  // };
+
+// --- Custom dropdown for loading favorites (replaces <select>) ---
+const loadTrigger = document.createElement('input');
+loadTrigger.type = 'text';
+loadTrigger.placeholder = 'Tänd lagerfavorit…';
+loadTrigger.readOnly = true;
+loadTrigger.className = 'favorite-input';
+
+const loadList = document.createElement('div');
+loadList.className = 'favorite-combo-list hidden';
+
+function updateDropdown() {
+  loadList.innerHTML = '';
+  const ids = JSON.parse(localStorage.getItem(docPrefix + 'savedLayersIds') ?? '[]');
+  ids.forEach(id => {
+    const item = document.createElement('div');
+    item.className = 'favorite-combo-item';
+    item.textContent = id;
+    // ARIA (valfritt, men bra)
+    item.setAttribute('role', 'option');
+    item.setAttribute('aria-selected', 'false');
+
+    item.onclick = () => {
       if (autoClearMode) performClear();
-      const saved = localStorage.getItem(docPrefix + 'savedLayers_' + id) || '';
-      saved.split(',').forEach(name => name && origo.api().getLayer(name)?.setVisible(true));
-      loadSelect.value = '';
-      updateSelectColor();
-    }
-  };
+      const saved = localStorage.getItem(docPrefix + 'savedLayers_' + id) ?? '';
+      saved.split(',').forEach(name => {
+        if (!name) return;
+        origo.api().getLayer(name)?.setVisible(true);
+      });
+      loadList.classList.add('hidden');
+    };
 
-  /* Input + Save + Delete buttons */
+    loadList.appendChild(item);
+  });
+}
+
+loadTrigger.addEventListener('click', () => {
+  // toggla listan + fyll vid öppning
+  if (loadList.classList.contains('hidden')) {
+    updateDropdown();
+    loadList.classList.remove('hidden');
+  } else {
+    loadList.classList.add('hidden');
+  }
+});
+
+// Stäng listan vid klick utanför (vänstra gruppen)
+document.addEventListener('click', (e) => {
+  if (!leftGroup.contains(e.target)) {
+    loadList.classList.add('hidden');
+  }
+});
+
+  // /* Input + Save + Delete buttons */
   const saveInput = document.createElement('input');
   saveInput.type = 'text';
-  saveInput.placeholder = 'Lagerfavorit';
-  saveInput.title = 'Ange lagerfavorit att skapa, skriva över eller radera';
+  saveInput.placeholder = 'Spara/ändra lagerfavorit';
+  saveInput.title = 'Ange eller välj lagerfavorit';
+  saveInput.className = 'favorite-input';
+
+  const comboList = document.createElement('div');
+  comboList.className = 'favorite-combo-list hidden';
+
+  
+  function updateComboList() {
+      comboList.innerHTML = '';
+      const ids = JSON.parse(localStorage.getItem(docPrefix + 'savedLayersIds') || '[]');
+
+      ids.forEach(id => {
+          const item = document.createElement('div');
+          item.className = 'favorite-combo-item';
+          item.textContent = id;
+
+          item.onclick = () => {
+              saveInput.value = id;
+              comboList.classList.add('hidden');
+          };
+
+          comboList.appendChild(item);
+      });
+  }
+
+
+  saveInput.addEventListener('focus', () => {
+      updateComboList();
+      comboList.classList.remove('hidden');
+  });
+  
+  document.addEventListener('click', e => {
+      if (!rightGroup.contains(e.target)) {
+          comboList.classList.add('hidden');
+      }
+  });
+
 
   const saveButton = document.createElement('button');
   saveButton.className = 'save-button';
@@ -211,22 +322,25 @@ function initLayerFavoritesToolbar() {
     saveInput.value = '';
   };
 
-  /* Groups */
+  // /* Groups */
   const leftGroup = document.createElement('div');
   leftGroup.className = 'group-container';
   const rightGroup = document.createElement('div');
   rightGroup.className = 'group-container';
   leftGroup.appendChild(lockButton);
   leftGroup.appendChild(clearButton);
-  leftGroup.appendChild(loadSelect);
+  // leftGroup.appendChild(loadSelect);
+  leftGroup.appendChild(loadTrigger);
+  leftGroup.appendChild(loadList);
   rightGroup.appendChild(saveInput);
   rightGroup.appendChild(saveButton);
   rightGroup.appendChild(deleteButton);
+  rightGroup.appendChild(comboList);
   topBar.appendChild(leftGroup);
   topBar.appendChild(rightGroup);
   document.body.appendChild(topBar);
 
-  /* Hover-trigger area */
+  // /* Hover-trigger area */
   const hoverTrigger = document.createElement('div');
   hoverTrigger.className = 'hover-trigger';
   document.body.appendChild(hoverTrigger);
@@ -244,22 +358,22 @@ function initLayerFavoritesToolbar() {
     topBar.className = topBar.className.replace('no-transition', '');
   }, 0);
 
-  /* Update lock icon */
+  // /* Update lock icon */
   const updateLockButton = () => {
     if (lockedMode) {
-      /* LOCKED – closed padlock */
+      // /* LOCKED – closed padlock */
       lockPath.setAttribute('d', 'M18 8h-1V6c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z');
       lockButton.classList.add('locked');
       lockButton.title = 'Aktivera auto-göm för verktygsfältet Lagerfavoriter';
     } else {
-      /* UNLOCKED – open shackle */
+      // /* UNLOCKED – open shackle */
       lockPath.setAttribute('d', 'M19 10h-1V7c0-2.76-2.24-5-5-5s-5 2.24-5 5h2c0-1.66 1.34-3 3-3s3 1.34 3 3v3H5c-1.1 0-2 .9-2 2v8c0 1.1 .9 2 2 2h14c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z');
       lockButton.classList.remove('locked');
       lockButton.title = 'Lås fast verktygsfältet Lagerfavoriter';
     }
   };
 
-  /* Click on lock icon */
+  // /* Click on lock icon */
   lockButton.onclick = () => {
     lockedMode = !lockedMode;
     saveLockedMode();
@@ -267,22 +381,26 @@ function initLayerFavoritesToolbar() {
     if (lockedMode) showTopBarAndPushCenter();
   };
 
-  /* AUTO-HIDE LOGIC */
+  // /* AUTO-HIDE LOGIC */
   let hideTimeout = null;
   let lastMouseX = null;
   let lastMouseY = null;
   document.addEventListener('mousemove', e => { lastMouseX = e.clientX; lastMouseY = e.clientY; });
 
+
   const hideTopBarAndResetCenter = () => {
     if (lockedMode) return;
     topBar.classList.add('hidden');
     document.querySelector('.o-ui .top-center')?.classList.remove('top-bar-visible');
+    favoritesTab.classList.remove('hidden');
   };
+
 
   const showTopBarAndPushCenter = () => {
     clearTimeout(hideTimeout);
     topBar.classList.remove('hidden');
     document.querySelector('.o-ui .top-center')?.classList.add('top-bar-visible');
+	favoritesTab.classList.add('hidden');
   };
 
   const showTopBar = showTopBarAndPushCenter;
@@ -290,22 +408,22 @@ function initLayerFavoritesToolbar() {
   const hideTopBar = e => {
     if (lockedMode) return;
     if (e?.relatedTarget && (topBar.contains(e.relatedTarget) || hoverTrigger.contains(e.relatedTarget))) return;
-    if ([saveInput, saveButton, loadSelect, clearButton, deleteButton, lockButton].includes(document.activeElement)) return;
+    if ([saveInput, saveButton, clearButton, deleteButton, lockButton].includes(document.activeElement)) return;
     hideTimeout = setTimeout(() => {
       if (lastMouseX !== null && document.elementFromPoint(lastMouseX, lastMouseY)?.closest('.top-bar, .hover-trigger')) return;
       hideTopBarAndResetCenter();
     }, 1000);
   };
 
-  /* Event listeners for showing the bar */
-  [clearButton, loadSelect, saveInput, saveButton, deleteButton, lockButton].forEach(el => {
-    el.addEventListener('mouseenter', showTopBar);
-    el.addEventListener('focus', showTopBar);
+  // /* Event listeners for showing the bar */
+  [clearButton, saveInput, saveButton, deleteButton, lockButton].forEach(el => {
+    // el.addEventListener('mouseenter', showTopBar);
+    // el.addEventListener('focus', showTopBar);
   });
-  loadSelect.addEventListener('mousedown', showTopBar);
-  saveInput.addEventListener('mousedown', showTopBar);
-  topBar.addEventListener('mousemove', showTopBar);
-  lockButton.addEventListener('mouseenter', showTopBar);
+  // loadSelect.addEventListener('mousedown', showTopBar);
+  // saveInput.addEventListener('mousedown', showTopBar);
+  // topBar.addEventListener('mousemove', showTopBar);
+  // lockButton.addEventListener('mouseenter', showTopBar);
 
   let touchStartY = null;
   let touchStartedInTrigger = false;
@@ -333,28 +451,31 @@ function initLayerFavoritesToolbar() {
     touchStartedInTrigger = false;
   });
   
-  hoverTrigger.addEventListener('mouseenter', showTopBar, { passive: true });
-  topBar.addEventListener('mouseenter', showTopBar, { passive: true });
+  // hoverTrigger.addEventListener('mouseenter', showTopBar, { passive: true });
+  // topBar.addEventListener('mouseenter', showTopBar, { passive: true });
   topBar.addEventListener('mouseleave', hideTopBar);
   document.addEventListener('mouseleave', hideTopBar);
   document.addEventListener('click', e => {
     if (lockedMode) return;
-    if (!topBar.contains(e.target) && document.activeElement !== saveInput) {
-      clearTimeout(hideTimeout);
-      hideTopBarAndResetCenter();
-    }
-  });
+	  // >>> NYTT: Om klick sker på flärpen, göm inte!
+	  if (e.target.closest('.favorites-tab')) return;
+	  if (!topBar.contains(e.target) && document.activeElement !== saveInput) {
+		clearTimeout(hideTimeout);
+		hideTopBarAndResetCenter();
+	  }
+	});
 
-  [loadSelect, saveButton, deleteButton].forEach(el => el.addEventListener('change', updateTrigger));
+
+  [saveButton, deleteButton].forEach(el => el.addEventListener('change', updateTrigger));
   [saveButton, deleteButton].forEach(el => el.addEventListener('click', updateTrigger));
 
-  /* Initialisation */
+  // /* Initialisation */
   topBar.className = 'top-bar hidden no-transition';
   updateDropdown();
   updateClearButtonAppearance();
   updateLockButton();
 
-  /* SHOW TOP-BAR IMMEDIATELY IF LOCKED */
+  // /* SHOW TOP-BAR IMMEDIATELY IF LOCKED */
   if (lockedMode) {
     setTimeout(() => {
       showTopBarAndPushCenter();

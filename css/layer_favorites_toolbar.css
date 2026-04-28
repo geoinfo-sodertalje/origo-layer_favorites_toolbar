@@ -20,14 +20,14 @@
   transition: transform 0.3s ease-in-out;
   z-index: 1000;
   box-sizing: border-box;
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   max-width: 600px; /* Width for big screens */
 }
 
 .top-bar.hidden {
-  transform: translateX(-50%) translateY(-100%);
+  transform: translateX(-50%) translateY(-120%);
 }
 
 .top-bar.no-transition {
@@ -105,6 +105,7 @@
 .top-bar select {
   padding: 2px 16px;
   font-size: 16px;
+  font: inherit;
   cursor: pointer;
   border: none;
   outline: none;
@@ -138,6 +139,7 @@
   flex: 1;
   box-sizing: border-box;
   min-width: 0;
+  font: inherit;
 }
 
 .top-bar input:hover {
@@ -208,6 +210,7 @@
     border: none;
     border-radius: 2em;
     max-width: 130px; /* Balances group widths */
+	
   }
 
   .top-bar input:focus {
@@ -328,3 +331,86 @@
     display: none !important;
   }
 }
+
+/* Yttre container för flärpen */
+.favorites-tab {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0; /* ingen extra spacing mellan balk och pil */
+
+  cursor: pointer;
+  z-index: 999999;
+  user-select: none;
+}
+
+/* Tunn, rundad balk – justera bredd/höjd här */
+.favorites-tab .flap-bar {
+margin-top: -5px;  
+width: 300px;            /* ★ bredd – ändra efter smak (t.ex. 180–260px) */
+  height: 12px;             /* ★ höjd – tunn linje-känsla */
+  background: #fff;     /* ★ grön – matcha din UI-färg */
+  border-radius: 6px;      /* rundade ändar */
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2); /* subtil "nederkant" */
+}
+
+/* Chevron-behållare */
+.favorites-tab .flap-arrow {
+  margin-top: -10px;        /* låter chevronen “hänga” mot balken */
+  background: #fff;     /* matcha balken */
+  color: #333;             /* chevron-färg via currentColor i SVG */
+  border-radius: 15px;
+  line-height: 0;          /* ingen extra höjd från radavstånd */
+  padding: 0px 5px 0px 5px;/* liten “puck” runt chevronen */
+  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Styr chevronens visuella storlek separat från text */
+.favorites-tab .flap-arrow .chevron {
+  width: 16px;             /* ★ chevron-storlek */
+  height: 16px;
+  display: block;
+}
+
+/* Hover-feedback om du vill (kan tas bort) */
+.favorites-tab:hover .flap-bar,
+.favorites-tab:hover .flap-arrow {
+  filter: brightness(0.95);
+}
+
+/* Döljs när top-bar är synlig */
+.favorites-tab.hidden {
+  display: none;
+}
+
+/* Right/left-grupper är containers i din top-bar */
+.top-bar .group-container { position: relative; }
+
+/* Själva listan */
+.favorite-combo-list {
+  position: absolute;
+  top: calc(100% + 6px); /* under innehållet i gruppen */
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100000;
+}
+.favorite-combo-item { padding: 6px 10px; cursor: pointer; font: inherit; }
+.favorite-combo-item:hover { background: rgba(0,0,0,0.06); }
+.favorite-combo-list.hidden { display: none; }
+
+.favorite-combo-item + .favorite-combo-item {
+	border-top: 1px solid rgba(0,0,0,0.10); /* tunn grå linje */
+}
+
+
